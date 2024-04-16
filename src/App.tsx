@@ -1,16 +1,26 @@
-import { useState } from 'react'
-import { addNote, getNotes } from './notes';
+import { useEffect, useState } from 'react'
+import { Note, addNote, getNotes } from './notes';
 import NoteElement from './Note';
 
+
 function App() {
-  const [notes, setNotes] = useState(getNotes());
+  const [notes, setNotes] = useState([] as Note[]);
   const [addTitle, setAddTitle] = useState("");
   const [addContent, setAddContent] = useState("");
+
+  async function refresh() {
+    getNotes().then(setNotes);
+  }
+
+  useEffect(() => {
+    refresh();
+  }, []);
+  
 
   return (
     <>
       <div id='notes'>
-        {notes.map((note, index) => <NoteElement key={index} id={note.id} title={note.title} content={note.content} refreshState={() => setNotes(getNotes)} />)}
+        {notes.map((note, index) => <NoteElement key={index} id={note.id} title={note.title} content={note.content} refreshState={refresh} />)}
       </div>
       <div>
         <h6>Add a note</h6>
@@ -21,8 +31,9 @@ function App() {
             id: notes.length,
             title: addTitle,
             content: addContent 
-          });
-          setNotes(getNotes());
+          }).then(refresh);
+          setAddTitle("");
+          setAddContent("");
         }}>Add</button>
       </div>
     </>

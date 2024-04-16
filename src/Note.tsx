@@ -20,17 +20,20 @@ function NoteElement({ id, title, content, refreshState }: NoteProps) {
             <div id={`update-modal-note-${id}`} className="update-modal">
                 <div className="update-modal-form">
                     <h6>Leave any field empty to keep previous</h6>
-                    <input type="text" id={`update-title-note-${id}`} placeholder="New title.." value={newTitle} onInput={(event) => setNewTitle((event.target as any).value)} />
-                    <input type="text" id={`update-title-note-${id}`} placeholder="New content.." value={newContent} onInput={(event) => setNewContent((event.target as any).value)} />
+                    <input type="text" id={`update-title-note-${id}`} placeholder={title} value={newTitle} onInput={(event) => setNewTitle((event.target as any).value)} />
+                    <input type="text" id={`update-title-note-${id}`} placeholder={content} value={newContent} onInput={(event) => setNewContent((event.target as any).value)} />
                     <button onClick={() => {
                         updateNote(id, {
                             id, 
-                            title: newTitle, 
-                            content: newContent
+                            title: newTitle || title, 
+                            content: newContent || content
                         });
+                        setNewTitle("");
+                        setNewContent("");
+                        setModalHidden(true);
                         refreshState();
                     }}>Update</button>
-                    <button onClick={() => setModalHidden(true)}>Close editing</button>
+                    <button onClick={() => setModalHidden(true)}>Cancel</button>
                 </div>
             </div>
         </div>

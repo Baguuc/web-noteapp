@@ -1,49 +1,35 @@
+import { addDoc, deleteDoc, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
+import { collections, database } from "./config/firebase";
+
 interface Note {
     id: number | string;
     title: string;
     content: string;
-
 }
 
 
-function refreshNotes(updated: Note[]) {
-    localStorage.setItem('noteapp-notes', JSON.stringify(updated));
-}
+async function getNotes() {
+    const notes = await getDocs(query(collections.notes));
 
-function getNotes() {
-    const notesString = localStorage.getItem('noteapp-notes') || "[]";
-    const notes: Note[] = JSON.parse(notesString);
-
-    return notes;
+    return notes.docs.map(doc => doc.data() as Note);
 }
 
 
-function addNote(note: Note) {
-    const updated = getNotes();
-    updated.push(note);
-
-    refreshNotes(updated);
+async function addNote(note: Note) {
+    note.id = (await getNotes()).length;
+    await addDoc(collections.notes, note);
 }
 
 
-function removeNote(id: number | string) {
-    const updated = getNotes().filter(note => note.id !== id);
-
-    refreshNotes(updated);
+async function removeNote(id: number | string) {
+    const noteRef = (await getDocs(query(collections.notes, where('id', '==', id)))).docs[0].ref;
+    await deleteDoc(noteRef);
 }
 
 
-function updateNote(id: number | string, newNote: Note) {
-    const updated = getNotes().map(note => {
-        if(note.id === id) {
-            note.title = newNote.title || note.title;
-            note.content = newNote.content || note.content;
-        }
-
-        return note;
-    });
-
-    refreshNotes(updated);
+async function updateNote(id: number | string, newNote: Note) {
+    const noteRef = (await getDocs(query(collections.notes, where('id', '==', id)))).docs[0].ref;
+    await updateDoc(noteRef, newNote as any);
 }
 
 
