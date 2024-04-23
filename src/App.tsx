@@ -1,43 +1,43 @@
-import { useEffect, useState } from 'react'
-import { Note, addNote, getNotes } from './notes';
-import NoteElement from './Note';
-
+import { useEffect, useState } from "react";
+import { Note, getNotes } from "./notes";
+import NoteElement from "./Note";
+import NoteSearchBar from "./NoteSearchForm";
+import "./styles.css";
+import NoteAddBar from "./NoteAdd";
 
 function App() {
   const [notes, setNotes] = useState([] as Note[]);
-  const [addTitle, setAddTitle] = useState("");
-  const [addContent, setAddContent] = useState("");
 
   async function refresh() {
-    getNotes().then(setNotes);
+    getNotes(undefined).then(setNotes);
   }
 
   useEffect(() => {
     refresh();
   }, []);
-  
 
   return (
-    <>
-      <div id='notes'>
-        {notes.map((note, index) => <NoteElement key={index} id={note.id} title={note.title} content={note.content} refreshState={refresh} />)}
+    <div className="flex flex-col items-center gap-2">
+      <NoteSearchBar setNotes={setNotes} />
+      <NoteAddBar
+        notes={notes}
+        onCompleted={refresh}
+        preCompleted={(addedNote) => setNotes([...notes, addedNote])}
+      />
+      <div id="notes">
+        {notes.map((note, index) => (
+          <NoteElement
+            key={index}
+            id={note.id}
+            title={note.title}
+            content={note.content}
+            notes={notes}
+            setNotes={setNotes}
+          />
+        ))}
       </div>
-      <div>
-        <h6>Add a note</h6>
-        <input type="text" placeholder="New title.." value={addTitle} onInput={(event) => setAddTitle((event.target as any).value)} />
-        <input type="text" placeholder="New content.." value={addContent} onInput={(event) => setAddContent((event.target as any).value)} />
-        <button onClick={() => {
-          addNote({
-            id: notes.length,
-            title: addTitle,
-            content: addContent 
-          }).then(refresh);
-          setAddTitle("");
-          setAddContent("");
-        }}>Add</button>
-      </div>
-    </>
-  )
+    </div>
+  );
 }
 
-export default App
+export default App;
