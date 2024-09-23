@@ -5,7 +5,7 @@
 ## How to self host
 1. Clone the repository
 ```bash
-git clone https://github.com/Baguuc/noteapp-react
+git clone https://github.com/Baguuc/web-noteapp
 ```
 2. Install the dependencies
 ```bash
